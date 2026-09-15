@@ -1,20 +1,30 @@
 import express from "express";
+import connectDB from "./config/db.js";
+import "dotenv/config";
 import productRoutes from "./routes/productRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 app.use(express.json());
 
-// routes
-app.use("/api", productRoutes);
-app.use("/api", userRoutes);
+// product routes
+app.use("/api/products", productRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Hello Backend");
+  res.json({ message: "Backend is running" });
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error(error.message);
+    process.exitCode = 1;
+  }
+};
+
+startServer();
